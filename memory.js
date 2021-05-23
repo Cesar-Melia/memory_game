@@ -75,31 +75,21 @@ let card2$$ = "";
 const manageClick = (event) => {
     const click$$ = { name: event.target.name, id: event.target.id };
     cardsToCompare.push(click$$);
-    console.log(event.target);
-    console.log(cardsToCompare[0]);
-    console.log(cardsToCompare[1]);
-
     validateAttempts(cardsToCompare);
 
     if (cardsToCompare.length === 2) {
         if (card1$$.name !== card2$$.name) {
-            hideCard(card1$$);
-            hideCard(card2$$);
-            resetAttempts();
-            // setTimeOut(hideCard(card1$$), 1000);
-            // setTimeOut(hideCard(card2$$), 1000);
+            delayHide(card1$$, card2$$);
         } else {
-            resetAttempts();
-            card1$$.setAttribute("data-status", "validated"); //corregir atributo data-function
-            card2$$.setAttribute("data-status", "validated"); //corregir atributo data-function
+            card1$$.setAttribute("data-function__status", "validated");
+            card2$$.setAttribute("data-function__status", "validated");
+            updateScore();
+            resetCardsToCompare();
         }
-        attemptsValue++;
-        attempts$$.textContent = `${attemptsValue}`;
+        updateAttempts();
     }
-
     const universeImg$$ = document.querySelector("[src='images/universe.svg']");
     if (universeImg$$ === null) {
-        score$$.textContent = `${scoreValue}`;
         alert("¡Enhorabuena, has ganado!");
     }
 };
@@ -117,13 +107,9 @@ for (let i = 0; i < cardArray.length; i++) {
 
 const validateAttempts = (attempts) => {
     if (event.target.name !== undefined) {
-        const status$$ = document.body.querySelector("[data-status='validated']");
-        console.log(status$$);
-        // if (status$$ !== null) {
-        //     alert("Esa carta ya esta validada, selecciona otra.");
-        //     cardsToCompare.pop();
-        // }
-
+        if (event.target.getAttribute("data-function__status") === "validated") {
+            cardsToCompare.pop();
+        }
         if (attempts[1] === undefined) {
             card1$$ = document.body.querySelector(`[id='${event.target.id}']`); //// No me coge #
             card1$$.setAttribute("src", `images/${event.target.name}.svg`);
@@ -132,7 +118,6 @@ const validateAttempts = (attempts) => {
             card2$$.setAttribute("src", `images/${event.target.name}.svg`);
 
             if (attempts[0].id === attempts[1].id) {
-                alert("No puedes volver a pulsar la misma carta");
                 cardsToCompare.pop();
             }
         }
@@ -145,9 +130,27 @@ const hideCard = (cardToHide) => {
     cardToHide.setAttribute("src", "images/universe.svg");
 };
 
-const delay = (cardToHide) => {};
+const delayHide = (card1, card2) => {
+    setTimeout(() => {
+        hideCard(card1);
+    }, 500);
+    setTimeout(() => {
+        hideCard(card2);
+    }, 500);
+    resetCardsToCompare();
+};
 
-const resetAttempts = () => {
+const resetCardsToCompare = () => {
     cardsToCompare.pop();
     cardsToCompare.pop();
+};
+
+const updateScore = () => {
+    scoreValue++;
+    score$$.textContent = `${scoreValue}`;
+};
+
+const updateAttempts = () => {
+    attemptsValue++;
+    attempts$$.textContent = `${attemptsValue}`;
 };
